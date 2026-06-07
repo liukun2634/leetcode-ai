@@ -2,7 +2,9 @@
 
 > 目标：通过 **15 道核心模板题 + 50 道高频扩展题**，覆盖大厂算法面试 95% 的考点。
 > 风格：每题都包含 **题意 → 思路 → Java 模板 → 复杂度 → 示例 → 复盘问答 + 同类型推荐**。
-> 本地测试：见 [`java-template/`](./java-template/README.md) —— 提供 `javac` + `java` 可直接跑的 I/O 模板。
+> 本地测试：
+> - [`java-leetcode-template/`](./java-leetcode-template/README.md) —— LeetCode 风格输入 `[1,2,3]`，自带链表/树解析
+> - [`java-template/`](./java-template/README.md) —— 通用人工/竞赛输入 `5\n1 2 3 4 5`，三档速度 Scanner / BufferedReader / StreamTokenizer
 
 ---
 
