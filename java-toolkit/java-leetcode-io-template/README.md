@@ -5,7 +5,7 @@
 ## 目录结构
 
 ```
-java-template/
+java-leetcode-io-template/
 ├── README.md
 ├── LeetCodeIO.java     // 输入解析工具：[1,2,3] / [[1,2],[3,4]] / "abc" 等
 ├── ListNode.java       // 链表结构 + 构造/打印工具
@@ -19,7 +19,7 @@ java-template/
 ### 编译 + 运行（PowerShell）
 
 ```powershell
-cd interview-prep/java-template
+cd java-toolkit/java-leetcode-io-template
 javac *.java
 # 方式一：交互输入
 java Main

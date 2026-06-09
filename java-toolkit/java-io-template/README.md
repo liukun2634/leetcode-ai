@@ -2,12 +2,12 @@
 
 > 适用场景：自己手敲输入测试、ACM/笔试题、数据量较大需要快速 I/O。
 > 输入格式：空格/换行分隔，**不需要** `[1,2,3]` 这种括号包裹。
-> 想要 LeetCode 风格（带 `[]`）请用同级 [`java-leetcode-template`](../java-leetcode-template/README.md)。
+> 想要 LeetCode 风格（带 `[]`）请用同级 [`java-leetcode-io-template`](../java-leetcode-io-template/README.md)。
 
 ## 目录结构
 
 ```
-java-template/
+java-io-template/
 ├── README.md
 ├── ScannerMain.java         // ① 最简单：Scanner（n ≤ 10^5 都够用）
 ├── BufferedReaderMain.java  // ② 中速：BufferedReader + StringTokenizer（n ≤ 10^6）
@@ -35,7 +35,7 @@ java-template/
 ## 编译运行（PowerShell）
 
 ```powershell
-cd interview-prep/java-template
+cd java-toolkit/java-io-template
 javac *.java
 
 # 交互输入：直接键盘敲
@@ -126,5 +126,5 @@ in.whitespaceChars(0, ' ');
 
 | 场景 | 用哪个 |
 |---|---|
-| 复现 LeetCode 题（输入是 `[2,7,11,15]` + `9`） | [`../java-leetcode-template`](../java-leetcode-template/README.md) |
+| 复现 LeetCode 题（输入是 `[2,7,11,15]` + `9`） | [`../java-leetcode-io-template`](../java-leetcode-io-template/README.md) |
 | 牛客/PAT/ACM/笔试（输入是 `5\n1 2 3 4 5`） | 本目录 |
