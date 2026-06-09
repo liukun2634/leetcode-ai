@@ -155,11 +155,30 @@ class Solution {
 ### 一句话总结
 > **BFS 分层 = 队列 + size 快照。每轮处理 size 个就是一层。**
 
-### 自我提问
-1. 不快照 size 会怎样？→ 当下一层节点入队后 `queue.size()` 会变大，分层失败。
-2. 为什么用 `ArrayDeque` 不用 `LinkedList`？→ `ArrayDeque` 数组实现，缓存友好，操作常数更小。
-3. 怎么改成 **锯齿形层序**（LC 103）？→ 用一个 `boolean reverse`，每层取反；或用 `Deque` 双端插入。
-4. 怎么自底向上输出（LC 107）？→ 最后 `Collections.reverse(ans)` 即可。
+### 新手常见疑问（FAQ）
+
+**Q1：不快照 size 会怎样？**
+A：当下一层节点入队后，`queue.size()` 会被脱带变大，层边界丢失 → 全所有节点会被拼成一层。
+
+**Q2：BFS 与 DFS 选哪个？**
+A：「按层」需求首选 BFS，同层节点天然连续；DFS 要额外传 depth。「最大深度/路径」选 DFS。同时必考「最少步数」只能 BFS（保证首次抵达是最短）。
+
+**Q3：`ArrayDeque` 与 `LinkedList` 差多少？**
+A：ArrayDeque 是数组实现，缓存友好，常数小；LinkedList 是双向链表，节点开销大且不连续。面试讲 `ArrayDeque` 是加分点。
+
+**Q4：空树是返回 `[]` 还是 `[[]]`？**
+A：LeetCode 要求 `[]`（空列表），不是含一个空层的列表。代码中 `root == null → return ans` 保证了这一点。
+
+**Q5：递归版 DFS 不会打乱顺序吗？**
+A：不会。`dfs(left)` 在 `dfs(right)` 之前，同层从左到右被依次加入 `ans.get(depth)`。
+
+### 面试官常见 follow-up
+1. **"锄齿状层序遍历（奇次从左右、偶次从右左）？"** → 多一个 `boolean reverse`，或用 `Deque` 到达顺序。即 **LC 103**。
+2. **"右视图（每层只取最后一个节点）？"** → 本模板取 `level.get(level.size() - 1)`；或 DFS 优先右子树。即 **LC 199**。
+3. **"每层最大值 / 平均值？"** → 一遍扫层时维护 max/sum。即 **LC 515 / 637**。
+4. **"填充每个节点的下一个右侧节点指针（LC 116/117）？"** → 同样 BFS，用 `pre` 记住同层前一个。
+5. **"多叉树怎么改？"** → 把 `node.left/right` 换成 `for (child : node.children)`。
+6. **"仅考虑层数、不需收集节点呢？"** → 不必快照 size，走完一轮才加 1；但推荐仍用本模板以保持一致。
 
 ### 同类型推荐（**树 BFS / 层序家族**）
 - LC 107. 二叉树的层序遍历 II（自底向上）
