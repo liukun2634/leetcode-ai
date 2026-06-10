@@ -28,11 +28,20 @@
 
 ## 二、解题思路（学习重点）
 
-### 1. 排序解法 O(n log n) 不达标
+### 1. 排序解法 O(n log n)（面试不达标，但是最直觉的儵子解）
 
-题目要 O(n)。排序解法虽然能通过，但不符合"最优"要求。
+题目明说要 O(n)。排序解法能 AC，但不符合「最优」要求。思路很直接：
 
-### 2. O(n) 关键洞察：**只从"序列起点"出发计数**
+1. 先 `Arrays.sort(nums)`。
+2. 扫一遍，用 `cnt` 记录当前连续段长度，`ans` 记录全局最大：
+   - `nums[i] == nums[i-1]` ：跳过（重复元素不算增长）。
+   - `nums[i] == nums[i-1] + 1`：`cnt++`。
+   - 其他：新段开始，`cnt = 1`。
+   - **每次更新 `cnt` 后都顺手 `ans = max(ans, cnt)`**。
+
+> ⚠️ **最常见的 Bug**：只在「段断开」的分支里才更新 `ans`。如果最长段刚好在**数组末尾**，该段永远不会被「段断开」的分支触发，`ans` 就丢了。修复：**要么每次 cnt 更新都 `ans = max(ans, cnt)`，要么 `return Math.max(ans, cnt)` 手动补一刀**。
+
+### 2. O(n) 关键洞察：**只从「序列起点」出发计数**
 
 **从暴力到 O(n) 的思路**：
 - 天真做法：对每个元素 x，看 x+1, x+2, ... 是否都在 `HashSet`。最坏 O(n²)——如 `[1,2,3,...,n]` 从 1 的起点会走 n 步，从 2 又走 n-1 步…总共 O(n²)。
@@ -83,6 +92,8 @@ for (int x : nums) set.add(x);
 
 ## 四、Java 题解
 
+### 解法 A：HashSet 只从起点扩展 O(n)（推荐）
+
 ```java
 class Solution {
     public int longestConsecutive(int[] nums) {
@@ -106,14 +117,41 @@ class Solution {
 **记忆口诀**：
 > **"装入 HashSet，只从起点向上数，长度取最大。"**
 
+### 解法 B：排序 O(n log n)（儵子解，面试不推荐）
+
+不允许额外空间或不许用哈希时的备选。要点：每次 `cnt` 更新后都要 `ans = max(ans, cnt)`，不能只在「段断开」时才结算。
+
+```java
+class Solution {
+    public int longestConsecutive(int[] nums) {
+        if (nums.length == 0) return 0;
+        Arrays.sort(nums);
+        int ans = 1, cnt = 1;
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] == nums[i - 1]) continue;          // 重复，跳过
+            if (nums[i] == nums[i - 1] + 1) cnt++;          // 延长
+            else cnt = 1;                                   // 新段
+            ans = Math.max(ans, cnt);                       // 每次更新都顺手取 max
+        }
+        return ans;
+    }
+}
+```
+
+> ⚠️ 一个很容易踩的坑：如果把 `ans = max(ans, cnt)` 写在「调到新段」的 else 分支里，**最后一段如果是最长序列则不会被结算**（如 `nums=[1,2,3,4]`）。修复两选一：
+> 1. 如上代码所示，**每次更新 cnt 后都 `ans = max(ans, cnt)`**；
+> 2. 保持原结构，最后 `return Math.max(ans, cnt);`。
+
 ---
 
 ## 五、复杂度
 
-| 项 | 复杂度 |
-|---|---|
-| 时间 | **O(n)**（每个元素最多被"被起点向上数"一次） |
-| 空间 | O(n) |
+| 解法 | 时间 | 空间 |
+|---|---|---|
+| A：HashSet | **O(n)** | O(n) |
+| B：排序 | O(n log n) | O(1)（原地排）或 O(log n)（递归栈） |
+
+> 题目明说「请你设计 O(n) 算法」，**面试一定写解法 A**。解法 B 可以作为备选提及，但要主动说出「不达标」。
 
 ---
 
@@ -154,7 +192,19 @@ A：`ArrayList.contains` 是 O(n) 线性扫描，总复杂度变 O(n²)。必须
 A：不需要。`HashSet` 天然去重，`[1,1,2,3]` 与 `[1,2,3]` 产生同样的 set，结果一样。
 
 **Q5：能不能用排序做？哪里不达标？**
-A：排序后扫一遍 O(n log n)，简单且能 AC。不达标是题目“请设计 O(n) 算法”的明示要求。面试要主动领会这个限制。
+A：排序后扫一遍 O(n log n)，简单且能 AC（见解法 B）。不达标是题目"请设计 O(n) 算法"的明示要求。面试要主动领会这个限制。
+
+**Q6：写排序解法时，为什么 `ans` 只在循环外或循环内"每次都更新"才安全？**
+A：常见 Bug 是把 `ans = max(ans, cnt)` 只写在"发现新段开始"的 else 分支里：
+```java
+for (int i = 1; i < n; i++) {
+    if (nums[i] == nums[i-1] + 1) cnt++;
+    else { ans = Math.max(ans, cnt); cnt = 1; }   // ❌
+}
+return ans;
+```
+反例 `nums = [1,2,3,4]`：循环里 `cnt` 一路涨到 4，但**永远走不到 else**，`ans` 始终是初始值 1。
+两种修法：① 每次更新 `cnt` 后都 `ans = max(ans, cnt)`；② 循环外补一刀 `return Math.max(ans, cnt)`。
 
 ### 面试官常见 follow-up
 1. **"怎么返回最长序列本身而不只是长度？"** → 记录 `best` 同时记起点 x，返回时 `[x, x+1, ..., x+best-1]`。
