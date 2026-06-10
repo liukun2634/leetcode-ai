@@ -99,7 +99,7 @@ List<Integer> view = Arrays.asList(arr);
 arr[0] = 99;            // view.get(0) 也变成 99
 ```
 
-> 详细版见 [06 · 常见转换与陷阱](./06-conversions-and-pitfalls.md#二arraysaslist-三个大坑)。
+> 详细版见 [06 · 常见转换与陷阱](./06-conversions-and-pitfalls.md)。
 
 ---
 
