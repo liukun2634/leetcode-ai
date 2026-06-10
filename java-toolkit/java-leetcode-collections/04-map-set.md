@@ -38,9 +38,21 @@ m.computeIfAbsent(k, key -> new ArrayList<>()).add(v);
 if (!m.containsKey(k)) m.put(k, new ArrayList<>());
 m.get(k).add(v);
 
-// 条件更新
+// 条件更新（key 存在才执行；lambda 返 null 会删除 key）
 m.computeIfPresent(k, (key, oldV) -> oldV + 1);
+
+// 同时处理"有/无"两种情况（lambda 拿到的 oldV 可能是 null）
+m.compute(k, (key, oldV) -> oldV == null ? 1 : oldV + 1);
 ```
+
+#### 四兄弟一表对比
+
+| 方法 | 触发条件 | lambda 返 `null` 的语义 | 典型用途 |
+|---|---|---|---|
+| `merge(k, v, f)` | 都会触发 | 删除 key | 计数：`merge(x, 1, Integer::sum)` |
+| `computeIfAbsent(k, f)` | key **不存在** | 不放入 | 分组：`computeIfAbsent(k, x -> new ArrayList<>()).add(v)` |
+| `computeIfPresent(k, f)` | key **存在** | 删除 key | 已有计数 +1 / 条件递减 |
+| `compute(k, f)` | 总是触发 | 删除 key | 同时处理新增 + 更新 |
 
 > `merge` 和 `computeIfAbsent` 是 LeetCode **最高频**的两个 Map 方法。
 
