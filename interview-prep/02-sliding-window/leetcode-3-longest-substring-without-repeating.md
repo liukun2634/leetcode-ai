@@ -109,16 +109,45 @@ class Solution {
 }
 ```
 
+### 解法 C：HashSet 滑窗（最直观，LeetCode 官方解风格）
+
+把窗口里的字符直接装进 `HashSet`，"窗口合法 ⇔ set 里没重复"。`r` 一直向右扩，遇到重复就**从左侧 `l` 开始一个个 `remove`，直到把重复字符挤出去**。
+
+```java
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        Set<Character> set = new HashSet<>();
+        int l = 0, best = 0;
+        for (int r = 0; r < s.length(); r++) {
+            char c = s.charAt(r);
+            while (set.contains(c)) {        // 窗口内已有 c → 从左缩到去掉这个 c 为止
+                set.remove(s.charAt(l));
+                l++;
+            }
+            set.add(c);                      // 现在窗口合法，把 c 加入
+            best = Math.max(best, r - l + 1);
+        }
+        return best;
+    }
+}
+```
+
+> 和解法 A 的关系：**本质同一个滑窗模板**，只是把"计数数组"换成了"HashSet"。计数数组适合 ASCII，HashSet 更直观且天然支持任意字符（含中文 / emoji 等 Unicode BMP）。
+>
+> 和解法 B 的关系：B 是"一步跳到位"，省掉 inner while 循环；C 是"逐字符缩"，写起来对刚学滑窗的人更顺手。两者复杂度同为 **O(n)**（`l` 总共只走 n 步）。
+
 ---
 
 ## 四、复杂度
 
-| 解法 | 时间 | 空间 |
-|---|---|---|
-| 滑动窗口 / 直接跳 | **O(n)** | O(Σ)，Σ ≤ 128 |
-| 暴力 | O(n³) | O(Σ) |
+| 解法 | 时间 | 空间 | 备注 |
+|---|---|---|---|
+| A：计数数组 + while 缩 | **O(n)** | O(Σ)，Σ ≤ 128 | 通用骨架，ASCII 最快 |
+| B：哈希表直接跳 | **O(n)** | O(Σ) | 省掉 inner while，常数最小 |
+| C：HashSet + while 缩 | **O(n)** | O(min(n, Σ)) | 最直观；天然支持 Unicode |
+| 暴力 | O(n³) | O(Σ) | — |
 
-> 滑动窗口 O(n) 的关键：`l` 和 `r` 都最多走 n 步，**双指针不回头**。
+> 三个 O(n) 解法的核心都一样：`l` 和 `r` 都最多走 n 步，**双指针不回头**。
 
 ---
 
