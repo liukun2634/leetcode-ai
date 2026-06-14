@@ -46,6 +46,48 @@ Integer[] arr2 = list3.toArray(new Integer[0]);
 | `Integer[]` | `stream().mapToInt(Integer::intValue).toArray()` | — | `Arrays.asList(arr)` (定长) |
 | `List<Integer>` | `stream().mapToInt(Integer::intValue).toArray()` | `toArray(new Integer[0])` | — |
 
+### 为什么 `List<Integer>` 不能直接 `toArray()` 拿 `int[]`？
+
+> **结论**：`List.toArray()` 只能产出**引用类型数组**（`Object[]` / `Integer[]` / `String[]` / `int[][]` …），永远拿不到 `int[]` 这种基本类型数组。`List<Integer> → int[]` **必须**走 stream。
+
+```java
+List<Integer> list = List.of(1, 2, 3);
+
+list.toArray();                  // 返回 Object[]，不是 Integer[]，更不是 int[]
+list.toArray(new Integer[0]);    // ✅ Integer[]
+list.toArray(new int[0]);        // ❌ 编译错误：int 不是引用类型，不能做泛型 T
+int[] a = list.toArray();        // ❌ 编译错误：Object[] 不能转 int[]
+
+// 想要 int[]，只能 stream
+int[] a2 = list.stream().mapToInt(Integer::intValue).toArray();
+```
+
+**原理**：`<T> T[] toArray(T[] a)` 的 `T` 必须是引用类型。`int` 是基本类型用不了；但 `int[]` 本身是对象（数组是引用类型），所以 `List<int[]>` 可以直接 `toArray(new int[0][])` —— 见下。
+
+### `List<int[]>` → `int[][]`（LeetCode 收集二维结果的高频写法）
+
+```java
+List<int[]> res = new ArrayList<>();
+res.add(new int[]{1, 2});
+res.add(new int[]{3, 4});
+
+int[][] ans = res.toArray(new int[0][]);     // ✅ 一行搞定，O(n)
+// 等价：res.toArray(new int[res.size()][]);
+```
+
+> 同理还有 `List<String[]>` → `String[][]`：`list.toArray(new String[0][])`。
+
+对比 `List<List<Integer>>` → `int[][]`，因为内层是 `Integer` 不是 `int[]`，就得套两层 stream：
+
+```java
+List<List<Integer>> r = ...;
+int[][] ans = r.stream()
+    .map(l -> l.stream().mapToInt(Integer::intValue).toArray())
+    .toArray(int[][]::new);
+```
+
+> 所以收集二维结果时，**能用 `List<int[]>` 就别用 `List<List<Integer>>`**，返回时省一大段代码。
+
 ### `char[]` / `String` / `String[]` / `List<String>` 互转
 
 ```java
